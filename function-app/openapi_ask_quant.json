@@ -1,0 +1,83 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CSI CRM Quantitative Specialist",
+    "description": "Generates DAX queries from natural language and executes them against the production CSI_DATA_MODEL Power BI Semantic Model. Best for NUMERIC questions: aggregations, top-N, KPIs, profit margin, win rate, aging analysis, sales performance.",
+    "version": "1.0.0"
+  },
+  "servers": [{"url": "https://function-app.azurewebsites.net"}],
+  "paths": {
+    "/api/ask-quant": {
+      "post": {
+        "operationId": "askQuant",
+        "summary": "Query Power BI Semantic Model with NL→DAX",
+        "description": "Use for QUANTITATIVE questions only: numbers, counts, sums, averages, top-N, win rates, profit/margin/revenue, aging analysis, ranked sales performance. NOT for narrative/why questions (use ask-combined Qual agent instead).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["q"],
+                "properties": {
+                  "q": {
+                    "type": "string",
+                    "description": "Natural language quantitative question (Thai or English)"
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "default": 0.1
+                  },
+                  "narrate": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Set false in orchestrator/tool mode to skip the internal Thai narrative (faster ~6s). When false, 'answer' is empty and the orchestrator must narrate from data + top_accounts + advisory."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quant answer with DAX trace + tabular data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "question":          {"type": "string"},
+                    "answer":            {"type": "string", "description": "Thai brief narrative from DAX result. EMPTY when narrate=false (tool mode) — narrate from the structured fields instead."},
+                    "advisory":          {"type": "string", "description": "Deterministic provenance/certified-measure/plausibility guardrail block (H3/H4). Append VERBATIM to the final answer — do not paraphrase. Empty when nothing to add."},
+                    "dax":               {"type": "string", "description": "DAX query that was executed"},
+                    "data":              {"type": "array",  "description": "Tabular rows from PBI executeQueries"},
+                    "row_count":         {"type": "integer"},
+                    "value":             {"type": "number", "nullable": true, "description": "Scalar value when aggregate-only with a single row"},
+                    "measure":           {"type": "string", "nullable": true, "description": "Column name used as the ranking measure"},
+                    "top_accounts":      {
+                      "type": "array",
+                      "description": "Top contributing accounts when Account dimension present (orchestrator should cite these)",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name":  {"type": "string"},
+                          "value": {"type": "number", "nullable": true},
+                          "name_source": {"type": "string", "nullable": true, "description": "'primary' = verified company name; 'heuristic' = best-guess from opportunity-name prefix — cite with a leading ~ ; null = unresolved GUID"}
+                        }
+                      }
+                    },
+                    "is_aggregate_only": {"type": "boolean", "description": "True when no Account dimension in result — orchestrator should cite 'aggregate across all accounts'"},
+                    "error":             {"type": "string", "nullable": true},
+                    "retried":           {"type": "boolean"},
+                    "attempts":          {"type": "integer"},
+                    "backend":           {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

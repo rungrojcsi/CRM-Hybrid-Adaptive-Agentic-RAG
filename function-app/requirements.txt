@@ -1,0 +1,12 @@
+azure-functions==1.21.3
+azure-identity==1.19.0
+azure-storage-blob==12.23.1
+pandas==2.2.3
+jinja2==3.1.4
+tiktoken==0.7.0
+psycopg2-binary==2.9.10
+# ML training deps (scikit-learn, shap) are NOT in the function runtime — the
+# serving endpoints (deals/deal/forecast/attainment) need only pandas/numpy.
+# Training/scoring (predictive.pipeline.run_scoring) runs offline; see
+# requirements-ml.txt. The /predictive/run HTTP endpoint therefore works only in
+# an environment that also installed requirements-ml.txt.

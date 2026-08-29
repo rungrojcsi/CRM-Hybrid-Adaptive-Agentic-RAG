@@ -1,0 +1,124 @@
+// V5 CRM measures for sm_crm_rs — v2 (IFERROR safe-cast)
+// Schema verified 2026-05-23, IFERROR pattern handles mixed-type rows from morning ingest
+// Successful first test: Total Plan Amount = 4,982,104,588.59
+//
+// Tables: fact_opportunity (45 cols), fact_activity (17), fact_goalmonth (3), fact_goal (14), dim_date
+// All numeric in fact_opportunity = text, use IFERROR(VALUE(...), 0)
+
+// ============================================================
+// CLUSTER 1: AMOUNT (Q4, foundation Q5 Q6)
+// ============================================================
+
+Total Plan Amount =
+    SUMX(fact_opportunity, IFERROR(VALUE(fact_opportunity[SO_Plan_Amount]), 0))
+
+Total Actual Amount =
+    SUMX(
+        FILTER(fact_opportunity, fact_opportunity[IsWon] = "True"),
+        IFERROR(VALUE(fact_opportunity[SO_Actual_Amount]), 0)
+    )
+
+Average Deal Size =
+    DIVIDE([Total Plan Amount], COUNTROWS(fact_opportunity), 0)
+
+// ============================================================
+// CLUSTER 2: COUNT + WIN RATE (Q5, Q6)
+// ============================================================
+
+Opportunity Count = COUNTROWS(fact_opportunity)
+
+Won Count =
+    CALCULATE([Opportunity Count], fact_opportunity[IsWon] = "True")
+
+Lost Count =
+    CALCULATE([Opportunity Count], fact_opportunity[Status] IN {"Lost", "Cancelled"})
+
+Open Count =
+    CALCULATE([Opportunity Count], fact_opportunity[IsPipeline] = "True")
+
+Win Rate % =
+    DIVIDE([Won Count], [Won Count] + [Lost Count], 0)
+
+// ============================================================
+// CLUSTER 3: RISK (Q1, Q7)
+// ============================================================
+
+Average Possibility % =
+    AVERAGEX(fact_opportunity, IFERROR(VALUE(fact_opportunity[Possibility]), BLANK()))
+
+Low Probability Count =
+    COUNTROWS(
+        FILTER(fact_opportunity,
+            fact_opportunity[IsPipeline] = "True" &&
+            IFERROR(VALUE(fact_opportunity[Possibility]), 100) < 50
+        )
+    )
+
+At Risk Count =
+    COUNTROWS(
+        FILTER(fact_opportunity,
+            fact_opportunity[IsPipeline] = "True" &&
+            (IFERROR(VALUE(fact_opportunity[Aging_Days]), 0) > 90 ||
+             IFERROR(VALUE(fact_opportunity[Possibility]), 100) < 30)
+        )
+    )
+
+// ============================================================
+// CLUSTER 4: AGING / STALE (Q7, Q8)
+// ============================================================
+
+Average Aging Days =
+    AVERAGEX(
+        FILTER(fact_opportunity, fact_opportunity[IsPipeline] = "True"),
+        IFERROR(VALUE(fact_opportunity[Aging_Days]), 0)
+    )
+
+Max Aging Days =
+    MAXX(
+        FILTER(fact_opportunity, fact_opportunity[IsPipeline] = "True"),
+        IFERROR(VALUE(fact_opportunity[Aging_Days]), 0)
+    )
+
+Stale Opp Count =
+    COUNTROWS(
+        FILTER(fact_opportunity,
+            fact_opportunity[IsPipeline] = "True" &&
+            IFERROR(VALUE(fact_opportunity[Aging_Days]), 0) > 90
+        )
+    )
+
+// ============================================================
+// CLUSTER 5: TARGET (Q2, Q4)
+// ============================================================
+
+Total Target = SUM(fact_goalmonth[Target_Amount])
+
+Achievement % =
+    DIVIDE([Total Actual Amount], [Total Target], 0)
+
+Target Variance =
+    [Total Actual Amount] - [Total Target]
+
+// ============================================================
+// CLUSTER 6: ACTIVITY (Q3)
+// ============================================================
+
+Activity Count = COUNTROWS(fact_activity)
+
+Active Sales Count = DISTINCTCOUNT(fact_activity[Sales_Person_ID])
+
+// ============================================================
+// TIME INTELLIGENCE — YTD
+// ============================================================
+
+Total Actual YTD =
+    CALCULATE([Total Actual Amount], DATESYTD(dim_date[Date]))
+
+Won Count YTD =
+    CALCULATE([Won Count], DATESYTD(dim_date[Date]))
+
+Win Rate YTD % =
+    CALCULATE([Win Rate %], DATESYTD(dim_date[Date]))
+
+Activity Count YTD =
+    CALCULATE([Activity Count], DATESYTD(dim_date[Date]))

@@ -1,0 +1,326 @@
+{
+  "fact_goal": [
+    {
+      "col": "Goal_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Sales_Person_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Parent_Goal_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Metric_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Goal_Title",
+      "type": "Text"
+    },
+    {
+      "col": "Sales_Person_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Parent_Goal_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Target_Amount",
+      "type": "Number"
+    },
+    {
+      "col": "Actual_Amount",
+      "type": "Number"
+    },
+    {
+      "col": "In_Progress_Amount",
+      "type": "Number"
+    },
+    {
+      "col": "%_Achieved",
+      "type": "Number"
+    },
+    {
+      "col": "Start_Date",
+      "type": "Date"
+    },
+    {
+      "col": "End_Date",
+      "type": "Date"
+    },
+    {
+      "col": "State_Code",
+      "type": "Integer"
+    }
+  ],
+  "fact_activity": [
+    {
+      "col": "Activity_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Sales_Person_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Sales_Person_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Regarding_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Regarding_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Subject",
+      "type": "Text"
+    },
+    {
+      "col": "Activity_Type_Code",
+      "type": "Integer"
+    },
+    {
+      "col": "Activity_Type",
+      "type": "Text"
+    },
+    {
+      "col": "State_Code",
+      "type": "Integer"
+    },
+    {
+      "col": "State_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Priority_Code",
+      "type": "Integer"
+    },
+    {
+      "col": "Duration__Mins_",
+      "type": "Integer"
+    },
+    {
+      "col": "Scheduled_Date",
+      "type": "Date"
+    },
+    {
+      "col": "Actual_End_Date",
+      "type": "Date"
+    },
+    {
+      "col": "Created_Date",
+      "type": "Date"
+    },
+    {
+      "col": "Opportunity_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Activity_Date",
+      "type": "Date"
+    }
+  ],
+  "fact_goalmonth": [
+    {
+      "col": "Sales_Person_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Target_Month",
+      "type": "Date"
+    },
+    {
+      "col": "Target_Amount",
+      "type": "Number"
+    }
+  ],
+  "fact_opportunity": [
+    {
+      "col": "Opportunity_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Create_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Update_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Sales_Person_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Sale_Person_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Opportunity_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Actual_Close_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Exchange_Rate",
+      "type": "Text"
+    },
+    {
+      "col": "Possibility",
+      "type": "Text"
+    },
+    {
+      "col": "Description",
+      "type": "Text"
+    },
+    {
+      "col": "Est._Close_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Solution_Name",
+      "type": "Text"
+    },
+    {
+      "col": "Status",
+      "type": "Text"
+    },
+    {
+      "col": "Account_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Contact_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Hot_Opportunity",
+      "type": "Text"
+    },
+    {
+      "col": "End_Customer_ID",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Plan_Date",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Actual_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Project_Code",
+      "type": "Text"
+    },
+    {
+      "col": "Total_SO_Plan_Amount",
+      "type": "Text"
+    },
+    {
+      "col": "Total_SO_Actual_Amount",
+      "type": "Text"
+    },
+    {
+      "col": "Progress",
+      "type": "Text"
+    },
+    {
+      "col": "IsImportant",
+      "type": "Text"
+    },
+    {
+      "col": "Opportunity_No",
+      "type": "Text"
+    },
+    {
+      "col": "Detail_Reasons",
+      "type": "Text"
+    },
+    {
+      "col": "Prospect_Category_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Solution_ID",
+      "type": "Text"
+    },
+    {
+      "col": "Prospect_Category_Name",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Actual_Amount",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Actual_Amount__H_",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Actual_Amount__K_",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Actual_Amount__P_",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Plan_Amount",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Plan_Amount__H_",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Plan_Amount__K_",
+      "type": "Text"
+    },
+    {
+      "col": "SO_Plan_Amount__P_",
+      "type": "Text"
+    },
+    {
+      "col": "Last_Activity_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Closed_Date",
+      "type": "Text"
+    },
+    {
+      "col": "Sales_Cycle_Days",
+      "type": "Text"
+    },
+    {
+      "col": "Aging_Days",
+      "type": "Text"
+    },
+    {
+      "col": "Aging_Group",
+      "type": "Text"
+    },
+    {
+      "col": "Aging_Sort",
+      "type": "Text"
+    },
+    {
+      "col": "IsWon",
+      "type": "Text"
+    },
+    {
+      "col": "IsPipeline",
+      "type": "Text"
+    }
+  ]
+}

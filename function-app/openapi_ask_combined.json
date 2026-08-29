@@ -1,0 +1,55 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CSI CRM Qualitative Specialist",
+    "description": "Searches both AI Search (10,940 chunks) and pgvector (35,385 chunks), merges + reranks, then synthesizes a Thai answer with cited account_ids. Use for narrative, customer history, notes, solution context, account stories.",
+    "version": "1.0.0"
+  },
+  "servers": [{"url": "https://function-app.azurewebsites.net"}],
+  "paths": {
+    "/api/ask-combined": {
+      "post": {
+        "operationId": "askCombined",
+        "summary": "Query qualitative CRM narrative (AI Search + pgvector merged)",
+        "description": "Use for QUALITATIVE questions: customer history, account context, solution narrative, why-questions, notes. Returns Thai synthesized answer with cited account names.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["q"],
+                "properties": {
+                  "q":           {"type": "string", "description": "Natural language question"},
+                  "top_k":       {"type": "integer", "default": 5},
+                  "combined_k":  {"type": "integer", "default": 8},
+                  "temperature": {"type": "number",  "default": 0.1}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Synthesized Thai answer with cited account sources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "question": {"type": "string"},
+                    "answer":   {"type": "string"},
+                    "sources":  {"type": "array"},
+                    "backend":  {"type": "string"},
+                    "pg_count": {"type": "integer"},
+                    "search_count": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

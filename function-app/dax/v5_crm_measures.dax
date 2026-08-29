@@ -1,0 +1,93 @@
+// V5 CRM measures — DEFINE MEASURE format (PBI executeQueries compatible)
+// Each line: MEASURE <table>[<name>] = <expression>
+// Use IFERROR(VALUE(...)) for text-as-number columns (Pitfall #7)
+
+MEASURE fact_opportunity[Total Plan Amount] =
+    SUMX(fact_opportunity, IFERROR(VALUE(fact_opportunity[SO_Plan_Amount]), 0))
+
+MEASURE fact_opportunity[Total Actual Amount] =
+    SUMX(
+        FILTER(fact_opportunity, fact_opportunity[IsWon] = "True"),
+        IFERROR(VALUE(fact_opportunity[SO_Actual_Amount]), 0)
+    )
+
+MEASURE fact_opportunity[Opportunity Count] = COUNTROWS(fact_opportunity)
+
+MEASURE fact_opportunity[Won Count] =
+    CALCULATE([Opportunity Count], fact_opportunity[IsWon] = "True")
+
+MEASURE fact_opportunity[Lost Count] =
+    CALCULATE([Opportunity Count], fact_opportunity[Status] IN {"Lost", "Cancelled"})
+
+MEASURE fact_opportunity[Open Count] =
+    CALCULATE([Opportunity Count], fact_opportunity[IsPipeline] = "True")
+
+MEASURE fact_opportunity[Win Rate %] =
+    DIVIDE([Won Count], [Won Count] + [Lost Count], 0)
+
+MEASURE fact_opportunity[Average Deal Size] =
+    DIVIDE([Total Plan Amount], [Opportunity Count], 0)
+
+MEASURE fact_opportunity[Average Possibility %] =
+    AVERAGEX(fact_opportunity, IFERROR(VALUE(fact_opportunity[Possibility]), BLANK()))
+
+MEASURE fact_opportunity[Low Probability Count] =
+    COUNTROWS(
+        FILTER(fact_opportunity,
+            fact_opportunity[IsPipeline] = "True" &&
+            IFERROR(VALUE(fact_opportunity[Possibility]), 100) < 50
+        )
+    )
+
+MEASURE fact_opportunity[At Risk Count] =
+    COUNTROWS(
+        FILTER(fact_opportunity,
+            fact_opportunity[IsPipeline] = "True" &&
+            (IFERROR(VALUE(fact_opportunity[Aging_Days]), 0) > 90 ||
+             IFERROR(VALUE(fact_opportunity[Possibility]), 100) < 30)
+        )
+    )
+
+MEASURE fact_opportunity[Average Aging Days] =
+    AVERAGEX(
+        FILTER(fact_opportunity, fact_opportunity[IsPipeline] = "True"),
+        IFERROR(VALUE(fact_opportunity[Aging_Days]), 0)
+    )
+
+MEASURE fact_opportunity[Max Aging Days] =
+    MAXX(
+        FILTER(fact_opportunity, fact_opportunity[IsPipeline] = "True"),
+        IFERROR(VALUE(fact_opportunity[Aging_Days]), 0)
+    )
+
+MEASURE fact_opportunity[Stale Opp Count] =
+    COUNTROWS(
+        FILTER(fact_opportunity,
+            fact_opportunity[IsPipeline] = "True" &&
+            IFERROR(VALUE(fact_opportunity[Aging_Days]), 0) > 90
+        )
+    )
+
+MEASURE fact_goalmonth[Total Target] = SUM(fact_goalmonth[Target_Amount])
+
+MEASURE fact_opportunity[Achievement %] =
+    DIVIDE([Total Actual Amount], [Total Target], 0)
+
+MEASURE fact_opportunity[Target Variance] =
+    [Total Actual Amount] - [Total Target]
+
+MEASURE fact_activity[Activity Count] = COUNTROWS(fact_activity)
+
+MEASURE fact_activity[Active Sales Count] = DISTINCTCOUNT(fact_activity[Sales_Person_ID])
+
+MEASURE fact_opportunity[Total Actual YTD] =
+    CALCULATE([Total Actual Amount], DATESYTD(dim_date[Date]))
+
+MEASURE fact_opportunity[Won Count YTD] =
+    CALCULATE([Won Count], DATESYTD(dim_date[Date]))
+
+MEASURE fact_opportunity[Win Rate YTD %] =
+    CALCULATE([Win Rate %], DATESYTD(dim_date[Date]))
+
+MEASURE fact_activity[Activity Count YTD] =
+    CALCULATE([Activity Count], DATESYTD(dim_date[Date]))

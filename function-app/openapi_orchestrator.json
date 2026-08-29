@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CSI CRM Orchestrator",
+    "description": "Single entry point for CSI CRM questions. Internally plans, calls the quantitative (NL→DAX) and qualitative (RAG) backends in parallel, and returns ONE unified Thai answer. The caller only needs to pass the user's question verbatim and return the 'answer' field unchanged.",
+    "version": "1.0.0"
+  },
+  "servers": [{"url": "https://function-app.azurewebsites.net"}],
+  "paths": {
+    "/api/orchestrator": {
+      "post": {
+        "operationId": "orchestrate",
+        "summary": "Answer a CSI CRM question (handles everything internally)",
+        "description": "Send the user's question VERBATIM. Returns a single unified Thai answer in 'answer'. Do NOT pre-classify, rewrite, or post-process — just relay the question in and the 'answer' out.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["q"],
+                "properties": {
+                  "q": {
+                    "type": "string",
+                    "description": "The user's question, VERBATIM (Thai or English). Do not edit."
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "default": 0.1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Unified Thai answer (+ trace fields)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "question": {"type": "string"},
+                    "answer":   {"type": "string", "description": "The final unified Thai answer. Return this to the user EXACTLY as given."},
+                    "quant":    {"type": "object", "description": "Quant trace (dax, data, value, measure, top_accounts, advisory, error)"},
+                    "qual":     {"type": "object", "description": "Qual trace (sources, pg_count, search_count)"},
+                    "plan":     {"type": "object", "description": "The quant_q / qual_q the orchestrator composed"},
+                    "backend":  {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

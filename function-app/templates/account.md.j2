@@ -1,0 +1,73 @@
+---
+entity: account
+account_id: {{ account["Account ID"] }}
+name: {{ account["Company Name"] | default("") }}
+industry: {{ account["Industry"] | default("") }}
+status: {{ account["Account Status"] | default("") }}
+generated_at: {{ generated_at }}
+---
+
+# {{ account["Company Name"] | default("(no name)") }}
+
+**Customer Code:** {{ account["Customer Code"] | default("—") }}
+**Industry:** {{ account["Industry"] | default("—") }}
+**Customer Type:** {{ account["Customer Type"] | default("—") }}
+**Account Status:** {{ account["Account Status"] | default("—") }}
+**Annual Revenue:** {{ account["Annual Revenue"] | default("—") }}
+**No. of Employees:** {{ account["No. of Employees"] | default("—") }}
+**Location:** {{ [account["City"], account["Province"], account["Country"]] | select | join(", ") or "—" }}
+**Website:** {{ account["Website"] | default("—") }}
+
+## Contacts ({{ contacts | length }})
+{% if contacts %}
+{% for c in contacts %}
+{% set _extras = [c["Email"] | default(""), c["Mobile Phone"] | default("")] | select | list %}
+- **{{ c["Contact Name"] | default("") }}** — {{ c["Job Title"] | default("") }}{{ (" | " + (_extras | join(" | "))) if _extras else "" }}
+{% endfor %}
+{% else %}
+_(none)_
+{% endif %}
+
+## Opportunities ({{ opportunities | length }})
+{% if opportunities %}
+{% for o in opportunities %}
+{% set _sol = o["Solution Name"] | default("") %}
+{% set _sp = o["Sale Person Name"] | default("") %}
+{% set _desc = o["Description"] | default("") | strip_html %}
+{% set _reason = o["Detail Reasons"] | default("") | strip_html %}
+- **{{ o["Opportunity Name"] | default("") }}** — {{ o["Status"] | default("") }} | Possibility: {{ o["Possibility"] | default("—") }}%{{ "" }}
+  Est. Close: {{ o["Est. Close Date"] | default("—") }} | SO Plan: {{ o["Total SO Plan Amount"] | default("—") }}{{ (" | Solution: " + _sol) if _sol else "" }}{{ (" | Sales: " + _sp) if _sp else "" }}{{ "" }}
+{% if _desc %}  Description: {{ _desc }}{{ "" }}
+{% endif %}
+{% if _reason %}  Reason: {{ _reason }}{{ "" }}
+{% endif %}
+{% if o["_connections"] %}  Stakeholders: {{ o["_connections"] | map(attribute="Stakeholder Role Name") | select | join(", ") }}{{ "" }}
+{% endif %}
+{% if o["_close"] %}
+{% set cl = o["_close"][0] %}
+{% set _cr = cl["Close Detail Reason"] | default("") %}
+{% if _cr %}  Closed: {{ _cr }} | Date: {{ cl["Actual Close Date"] | default("—") }}{{ "" }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% else %}
+_(none)_
+{% endif %}
+
+## Recent Activities ({{ activities | length }})
+{% if activities %}
+{% for a in activities %}
+- **{{ a["Activity Date"] | default("") }}** — {{ a["Subject"] | default("") }} ({{ a["Activity Type"] | default("") }}) — {{ a["State Name"] | default("") }}
+{% endfor %}
+{% else %}
+_(none)_
+{% endif %}
+{% if notes %}
+
+## Notes ({{ notes | length }})
+{% for n in notes %}
+**{{ n["title"] }}** ({{ n["date"] }})
+{{ n["body"] }}{{ "" }}
+
+{% endfor %}
+{% endif %}

@@ -1,0 +1,16 @@
+question,expected_must_contain,expected_must_not_contain,category
+"Profit margin ตอนนี้กี่เปอร์เซ็นต์","[Profit Margin %]","Dim_Account",scalar
+"สรุปกำไรขาดทุนปีนี้","[Total Revenue YTD]","Dim_Account",ytd
+"Profit margin แต่ละแผนก","Dim_Department[Department_Group]","Dim_Account",groupby
+"Top 5 deal ใหญ่สุดเป็นของใคร","TOPN(5","Dim_Account",topn
+"สรุปยอด won ของ sales แต่ละคนปีนี้","Sale Person Name","IsWon = TRUE",groupby
+"Salesperson1 ยอดขายเดือนต่อเดือนปีนี้","[Total Revenue]","SUM(Fact_Opportunity[SO Actual Amount])",per_month_breakdown
+"แผนกไหนเสี่ยงสุด","[Profit Margin % YTD]","Dim_Account",groupby
+"เดือนไหนกำไรดีสุด","Dim_Date[Month Year]","[YearMonth]",per_month
+"Sales ไหน deal ค้างนานสุด","Aging Days","Dim_Account",aging
+"Salesperson2 มี deal ค้างอะไรบ้าง","SEARCH(""Salesperson2""","Dim_Account",detail_list
+"ลูกค้ารายไหน winrate สูง opp > 10","Account ID","Dim_Account",winrate
+"Activity per sales by type","Activity data not in CSI_DATA_MODEL","Fact_Activity",not_in_model
+"ยอด pipeline แต่ละ status","Status","Dim_Account",groupby
+"กำไรปีนี้กับปีที่แล้ว","[Total Profit YTD]","[YearMonth]",yoy
+"จำนวน deal hot ตอนนี้","Hot Opportunity","Dim_Account",count

@@ -1,0 +1,86 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "CSI CRM Hybrid RAG",
+    "description": "Hybrid Qual + Quant RAG over CSI CRM data. Routes by intent (qualitative narrative vs quantitative DAX), fans out to AI Search + pgvector + Power BI Semantic Model, then synthesizes a unified Thai answer.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://function-app.azurewebsites.net",
+      "description": "Production Azure Function"
+    }
+  ],
+  "paths": {
+    "/api/ask-hybrid": {
+      "post": {
+        "operationId": "askHybrid",
+        "summary": "Ask the CSI CRM hybrid bot",
+        "description": "Send a natural-language question (Thai or English) about CRM accounts, opportunities, sales performance, activities, or pipeline. The bot auto-routes between qualitative search (account notes, history) and quantitative DAX queries (numbers, top-N, KPIs).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["q"],
+                "properties": {
+                  "q": {
+                    "type": "string",
+                    "description": "User question in Thai or English"
+                  },
+                  "top_k": {
+                    "type": "integer",
+                    "default": 5,
+                    "description": "Number of qualitative chunks per backend"
+                  },
+                  "combined_k": {
+                    "type": "integer",
+                    "default": 8,
+                    "description": "Max chunks after merge/rerank"
+                  },
+                  "force_intent": {
+                    "type": "string",
+                    "enum": ["qual", "quant", "hybrid"],
+                    "description": "Override the LLM intent classifier"
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "LLM temperature for synthesizer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Synthesized answer with provenance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "question":     { "type": "string" },
+                    "answer":       { "type": "string", "description": "Thai natural-language answer" },
+                    "intent":       { "type": "string", "enum": ["qual", "quant", "hybrid"] },
+                    "qual_sources": { "type": "array", "items": { "type": "string" }, "description": "Account IDs cited" },
+                    "quant_dax":    { "type": "string", "nullable": true, "description": "DAX query executed" },
+                    "quant_data":   { "type": "array", "items": { "type": "object" }, "description": "Tabular rows from PBI" },
+                    "backend":      { "type": "string" },
+                    "pg_count":     { "type": "integer" },
+                    "search_count": { "type": "integer" },
+                    "quant_count":  { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing q field" },
+          "500": { "description": "Backend error" }
+        }
+      }
+    }
+  }
+}

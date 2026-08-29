@@ -1,0 +1,25 @@
+---
+entity: salesperson
+salesperson: {{ salesperson }}
+generated_at: {{ generated_at }}
+---
+
+# Salesperson: {{ salesperson }}
+
+**Accounts:** {{ account_count }} | **Deals:** {{ deal_count }}
+
+## Deals
+{% for d in deals %}
+- **{{ d.account_name }}** — {{ d.opp_name | default("") }} ({{ d.status | default("") }}){{ (" | " + d.solution) if d.solution else "" }} | Est. Close: {{ d.est_close | default("—") }}
+{% if d.description %}  {{ d.description }}
+{% endif %}
+{% endfor %}
+
+## Recent Activities ({{ activities | length }})
+{% if activities %}
+{% for a in activities %}
+- **{{ a.date }}** — {{ a.subject | default("") }} ({{ a.type | default("") }}) — {{ a.state | default("") }}
+{% endfor %}
+{% else %}
+_(none)_
+{% endif %}

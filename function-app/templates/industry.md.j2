@@ -1,0 +1,13 @@
+---
+entity: industry
+industry: {{ industry }}
+generated_at: {{ generated_at }}
+---
+
+# Industry: {{ industry }}
+
+**Accounts:** {{ account_count }}
+
+{% for a in accounts %}
+- **{{ a.account_name }}**{{ (" (" + a.customer_type + ")") if a.customer_type else "" }}{{ (" — " + a.location) if a.location else "" }} | Opps: {{ a.opp_count }}{{ (" | Solutions: " + (a.solutions | join(", "))) if a.solutions else "" }}
+{% endfor %}

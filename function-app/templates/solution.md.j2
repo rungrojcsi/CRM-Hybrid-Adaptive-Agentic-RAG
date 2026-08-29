@@ -1,0 +1,17 @@
+---
+entity: solution
+solution: {{ solution }}
+generated_at: {{ generated_at }}
+---
+
+# Solution: {{ solution }}
+
+**Deals:** {{ deal_count }} across {{ account_count }} accounts
+
+{% for d in deals %}
+- **{{ d.account_name }}** — {{ d.opp_name | default("") }} ({{ d.status | default("") }}) | Possibility: {{ d.possibility | default("—") }}%{{ (" | Sales: " + d.sale_person) if d.sale_person else "" }}
+{% if d.description %}  {{ d.description }}
+{% endif %}
+{% if d.detail_reasons %}  Reason: {{ d.detail_reasons }}
+{% endif %}
+{% endfor %}

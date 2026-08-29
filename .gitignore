@@ -1,0 +1,65 @@
+# Credentials & secrets
+.mcp.json
+.funckey
+*.key
+*.pem
+.env
+.env.*
+secrets.*
+
+# Logs
+*.log
+
+# Deploy packages
+deploy_*.zip
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Test cache
+.pytest_cache/
+.python_packages/
+
+# Large binaries (diagrams, presentations — kept local)
+*.pptx
+*.pdf
+*.png
+*.zip
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+.claude/settings.local.json
+
+# Function App local secrets
+function-app/local.settings.json
+
+# PII — customer names + revenue from CSI CRM (local-only per security policy)
+function-app/transform/account_lookup.json
+function-app/transform/account_lookup_heuristic.json
+function-app/transform/dim_account.json
+
+# CSI internal mapping doc
+function-app/tests/fixtures/datamapping_d365ce.xlsx
+
+# Local workspaces (not for repo)
+Documents/
+graphify-out/
+
+# Handoff notes (transient)
+HANDOFF_*.md
+
+# Migration planning docs (aggregate figures — local only)
+docs/MIGRATION_PLAN_*.md
+
+# generated NotebookLM decks (large binaries — regenerable)
+docs/Predictive/*.pdf
+docs/Predictive/*.pptx
