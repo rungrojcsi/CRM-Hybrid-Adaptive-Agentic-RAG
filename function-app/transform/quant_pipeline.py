@@ -1,8 +1,10 @@
 """
-quant_pipeline.py — Shared Quant pipeline: generate DAX → execute → retry-on-empty.
+quant_pipeline.py — Shared Quant pipeline: generate DAX → execute (one attempt).
 
-Used by both `/api/ask-quant` and `/api/ask-hybrid` to remove duplication and
-centralise retry + telemetry.
+Used by `/api/ask-quant`, `/api/ask-hybrid` and `/api/orchestrator` to remove
+duplication and centralise telemetry. Retry-on-empty is NOT here — the only
+retry left in the system is the code-capped re-ask in the `/api/orchestrator`
+handler, which calls this function a second time with the verbatim question.
 """
 
 from __future__ import annotations

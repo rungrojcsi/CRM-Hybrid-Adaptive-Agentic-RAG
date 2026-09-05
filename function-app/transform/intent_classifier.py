@@ -6,7 +6,9 @@ Returns one of: "qual" | "quant" | "hybrid"
   quant  = numbers, aggregations, "top N", KPIs, time periods
   hybrid = mixed (e.g., "Top 5 deals + explain risk")
 
-Uses gpt-4o-mini for speed/cost balance (~500ms, ~$0.001/call).
+Deployment is set by INTENT_CLASSIFIER_DEPLOYMENT (default: gpt-5.4).
+One short call, temperature 0, 16 completion tokens — kept small because it sits
+on the critical path of every ask-hybrid request.
 """
 
 from __future__ import annotations

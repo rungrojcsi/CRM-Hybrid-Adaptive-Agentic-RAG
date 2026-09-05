@@ -24,7 +24,7 @@ Problems getting value out of CRM data before this tool existed:
 
 - **The data was locked in Dynamics 365 / Power BI** — a salesperson who wanted "how many open deals does account X have and why are they stuck" had to ask an analyst; there was no natural-language front door.
 - **Numeric questions needed someone who could write DAX** — totals, top-N, win rates, time-period aggregations all required a human to author a query against the semantic model.
-- **Qualitative context was buried** — account history, meeting notes, and the "why" behind a deal lived in free text no one could search across 11,500 accounts.
+- **Qualitative context was buried** — account history, meeting notes, and the "why" behind a deal lived in free text no one could search across ~9,300 accounts.
 - **One retrieval method could never cover both** — plain vector RAG hallucinates numbers; plain text-to-DAX can't tell a customer story.
 
 ## 2. Gap
@@ -42,7 +42,7 @@ Classify what the question needs, retrieve with the right method, and combine �
 
 1. **Adaptive** — an intent classifier tags each question `quant | qual | hybrid` and routes it (`transform/intent_classifier.py`)
 2. **Hybrid** — retrieval combines vector + keyword + semantic reranking in one Azure AI Search query, and combines the quant path (DAX over the live model) with the qual path (vector over markdown)
-3. **Agentic** — an orchestrator decomposes a multi-part question into sub-questions, DAX is generated and run as a tool, the quant path self-corrects on failure, and the parts are unified into one grounded answer (Thai)
+3. **Agentic** — an orchestrator decomposes a multi-part question into sub-questions, DAX is generated and run as a tool, an empty quant leg gets one code-capped re-ask inside `/api/orchestrator`, and the parts are unified into one grounded answer (Thai)
 
 ## 4. Where It Sits
 
@@ -62,7 +62,7 @@ Design principles:
 - **Right retriever per question** — the intent classifier prevents the two classic failures (vector RAG inventing numbers; text-to-DAX unable to narrate)
 - **Numbers come from the certified model, not the LLM** — the quant path generates DAX and executes it against the live Power BI model, so aggregates match the CRM's certified measures
 - **Account-centric documents** — the transform layer renders one markdown doc per account (plus solution / salesperson / industry lenses) so retrieval returns coherent context, not scattered rows
-- **Self-correcting quant path** — `quant_pipeline.run_with_retry` retries failed DAX with feedback before giving up
+- **One retry, and only in the orchestrator** — `quant_pipeline.run_with_retry` is a single generate + execute pass despite its name (the synchronous retry was removed: a second round pushed `ask-quant` past the Foundry ~30s tool window and surfaced as a generic failure). `/api/orchestrator` adds one code-capped re-ask when the quant leg returns no rows, re-running the user's verbatim question instead of the planner's rephrasing. `ask-quant` and `ask-hybrid` make one attempt and return empty as-is.
 - **Test-first with synthetic fixtures** — the full suite runs with no live data and no Azure credentials
 
 ### In-app pipeline
@@ -81,9 +81,9 @@ Design principles:
 | Item | Status |
 |------|--------|
 | Transform: live model → account-centric markdown (+ lenses) | ✅ Working |
-| Azure AI Search hybrid retrieval (vector + keyword + semantic) | ✅ Working (~10,940 docs indexed) |
+| Azure AI Search hybrid retrieval (vector + keyword + semantic) | ✅ Working (~10,940 docs indexed — one per account, plus the lens docs) |
 | Intent classifier + adaptive routing | ✅ Working |
-| Quant path: DAX generation + live execution + self-retry | ✅ Working |
+| Quant path: DAX generation + live execution (one attempt; one re-ask in `/api/orchestrator`) | ✅ Working |
 | Agentic orchestrator: sub-question decompose + unify | ✅ Working |
 | Foundry agent (`crm-rag-agent`, Thai) over the API | ✅ Configured |
 | Unit tests (synthetic fixtures) + CI | ✅ Green |
