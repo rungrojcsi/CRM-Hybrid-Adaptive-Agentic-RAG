@@ -63,3 +63,7 @@ docs/MIGRATION_PLAN_*.md
 # generated NotebookLM decks (large binaries — regenerable)
 docs/Predictive/*.pdf
 docs/Predictive/*.pptx
+
+# allow committed documentation images
+!docs/images/
+!docs/images/*.png

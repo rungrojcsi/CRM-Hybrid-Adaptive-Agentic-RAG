@@ -16,6 +16,8 @@ Ask the CRM in plain language and get grounded answers — a hybrid, adaptive, l
 
 **The shift:** questions that used to route through the **Business Analysis team — slow and often inaccurate** — are now answered directly by the system in seconds, grounded in the certified model. Analysts move off ad-hoc lookups; the frontline gets answers on demand.
 
+![Architecture — adaptive RAG routing](docs/images/architecture.png)
+
 ## 1. Pain Points
 
 Problems getting value out of CRM data before this tool existed:
