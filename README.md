@@ -46,22 +46,14 @@ Classify what the question needs, retrieve with the right method, and combine �
 
 ## 4. Where It Sits
 
-Upstream of the retrieval sits a one-way data flow from the live CRM model into searchable form:
+Upstream of the retrieval sits a one-way data flow from the live CRM model into searchable form; downstream, the
+answer is assembled from whichever paths the classifier picked:
 
-```mermaid
-flowchart LR
-    A["Dynamics 365 CE<br/>Power BI SALES DATA MODEL"] -->|DAX extract| B["Account-centric<br/>aggregate + render"]
-    B --> C["silver-md blobs"]
-    C -->|hourly indexer| D["Azure AI Search<br/>vector + keyword + semantic"]
-    Q([User question]) --> IC{"intent<br/>classifier"}
-    IC -->|quant| DX["generate DAX →<br/>live model"]
-    IC -->|qual| D
-    IC -->|hybrid| ORC["orchestrator<br/>decompose + unify"]
-    ORC --> DX
-    ORC --> D
-    DX --> ANS([Grounded answer])
-    D --> ANS
-```
+![End-to-end architecture — hourly ingest, adaptive routing, unified answer](docs/images/architecture-end-to-end.png)
+
+The hourly band (top) renders the live model into account-centric markdown and indexes it. The per-question band
+(bottom) routes the question, runs one or both retrieval paths, and unifies the parts. Source for the diagram:
+[`docs/architecture-end-to-end.html`](docs/architecture-end-to-end.html).
 
 ## 5. Design
 
